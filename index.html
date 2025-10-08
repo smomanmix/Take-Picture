@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Photo Upload</title>
+</head>
+<body style="text-align:center; padding: 20px; font-family: Arial;">
+  <h2>Take Photo</h2>
+  <input type="file" accept="image/*" capture="camera" id="cameraInput"><br><br>
+  <button onclick="uploadPhoto()">Upload Photo</button>
+
+  <p id="status"></p>
+
+  <script>
+    function uploadPhoto() {
+      const fileInput = document.getElementById('cameraInput');
+      if (!fileInput.files.length) {
+        alert("Please take a photo first.");
+        return;
+      }
+
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.onloadend = function() {
+        const base64Data = reader.result;
+        const fileName = 'Photo_' + new Date().getTime() + '.png';
+
+        google.script.run.withSuccessHandler(function(url) {
+          document.getElementById('status').innerHTML = 
+            'Uploaded! <a href="' + url + '" target="_blank">View on Drive</a>';
+        }).uploadImage(base64Data, fileName);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
